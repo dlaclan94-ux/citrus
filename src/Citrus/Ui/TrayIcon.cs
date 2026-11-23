@@ -23,6 +23,11 @@ internal sealed class TrayIcon : IDisposable
     int _percent = -1;
     string? _lastOutput;
     int _busy;
+    string _lastTitle = "";
+    string _lastText = "";
+    bool _lastWarning;
+    bool _quiet; // 작업 결과는 Windows 알림 대신 작업 중 창에 보여 준다
+    readonly BusyWindow _busyWindow = new();
 
     public event Action<bool>? EnabledChanged;
     public event Action<bool>? ExplorerOnlyChanged;
@@ -103,7 +108,24 @@ internal sealed class TrayIcon : IDisposable
     {
         _busy = Math.Max(0, _busy - result.Files.Count);
         UpdateText();
+        _quiet = true;
+        try
+        {
+            NotifyResult(result);
+        }
+        finally
+        {
+            _quiet = false;
+        }
+        // 작업 중 창은 모든 작업이 끝났다고 확인된 이 자리에서만 닫는다 (결과를 잠깐 보여 준 뒤)
+        if (_busy == 0)
+            _busyWindow.ShowDone(_lastTitle, _lastText, _lastWarning);
+        else if (_lastWarning) // 다른 작업이 아직 돌아 창이 결과를 못 보여 줄 때 실패만은 알린다
+            _icon.ShowBalloonTip(4000, _lastTitle, _lastText, Forms.ToolTipIcon.Warning);
+    }
 
+    void NotifyResult(BatchResult result)
+    {
         if (result.Target.Engine == Core.ConversionEngine.CopyPath)
         {
             Notify(
@@ -169,7 +191,11 @@ internal sealed class TrayIcon : IDisposable
     public void Notify(string title, string text, Forms.ToolTipIcon icon = Forms.ToolTipIcon.Info, string? reveal = null)
     {
         _lastOutput = reveal;
-        _icon.ShowBalloonTip(4000, title, text, icon);
+        _lastTitle = title;
+        _lastText = text;
+        _lastWarning = icon != Forms.ToolTipIcon.Info;
+        if (!_quiet)
+            _icon.ShowBalloonTip(4000, title, text, icon);
     }
 
     /// <summary>
@@ -214,6 +240,7 @@ internal sealed class TrayIcon : IDisposable
 
     public void Dispose()
     {
+        _busyWindow.Close();
         _icon.Visible = false;
         _icon.Dispose();
         _image.Dispose();
@@ -229,6 +256,8 @@ internal sealed class TrayIcon : IDisposable
             : _enabledItem.Checked ? "Citrus — 대기 중" : "Citrus — 꺼짐";
         _icon.Text = text;
         _cancelItem.Visible = _cancelSeparator.Visible = _busy > 0;
+        if (_busy > 0)
+            _busyWindow.ShowStatus(_percent >= 0 ? $"{_busy}개 처리 중 · {_percent}%" : $"{_busy}개 처리 중", _percent);
     }
 
     static void RevealInExplorer(string path) =>

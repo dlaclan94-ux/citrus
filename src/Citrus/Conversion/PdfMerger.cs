@@ -26,19 +26,30 @@ internal static class PdfMerger
         var first = ordered[0];
         var slot = Path.Combine(Path.GetDirectoryName(first)!, $"{Path.GetFileNameWithoutExtension(first)} 외 {ordered.Count - 1}개.pdf");
         var output = OutputPaths.Reserve(slot, ".pdf");
+        // 쓰는 중인 파일을 열면 "페이지를 표시할 수 없습니다" 가 뜨므로 (NAS 에서는 저장이 오래 걸린다)
+        // 이름 자리만 숨겨서 잡아 두고 숨긴 임시 파일에 다 쓴 뒤 그 이름으로 바꾼다
+        File.SetAttributes(output, FileAttributes.Hidden);
+        var work = Path.Combine(Path.GetDirectoryName(output)!, $"~citrus-{Guid.NewGuid():N}.pdf");
         try
         {
-            using var merged = new PdfDocument();
-            foreach (var file in ordered)
+            using (var merged = new PdfDocument())
             {
-                using var source = Open(file);
-                foreach (var page in source.Pages)
-                    merged.AddPage(page);
+                foreach (var file in ordered)
+                {
+                    using var source = Open(file);
+                    foreach (var page in source.Pages)
+                        merged.AddPage(page);
+                }
+                merged.Save(work);
             }
-            merged.Save(output);
+            File.SetAttributes(work, FileAttributes.Hidden);
+            File.Delete(output); // 숨김 파일은 덮어쓸 수 없어 지우고 옮긴다
+            File.Move(work, output);
+            File.SetAttributes(output, FileAttributes.Normal);
         }
         catch
         {
+            ConversionService.TryDelete(work);
             ConversionService.TryDelete(output);
             throw;
         }

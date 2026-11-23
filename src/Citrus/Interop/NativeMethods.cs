@@ -20,6 +20,7 @@ internal static class NativeMethods
     public const uint GA_ROOT = 2;
 
     public const uint SWP_NOSIZE = 0x0001;
+    public const uint SWP_NOMOVE = 0x0002;
     public const uint SWP_NOACTIVATE = 0x0010;
     public const uint SWP_SHOWWINDOW = 0x0040;
     public static readonly IntPtr HWND_TOPMOST = new(-1);
@@ -94,6 +95,22 @@ internal static class NativeMethods
     [DllImport("user32.dll", SetLastError = true)]
     [return: MarshalAs(UnmanagedType.Bool)]
     public static extern bool SetWindowPos(IntPtr hWnd, IntPtr hWndInsertAfter, int x, int y, int cx, int cy, uint uFlags);
+
+    public const int GWL_EXSTYLE = -20;
+    public const long WS_EX_TRANSPARENT = 0x20;
+    public const long WS_EX_TOOLWINDOW = 0x80;
+    public const long WS_EX_NOACTIVATE = 0x08000000;
+
+    [DllImport("user32.dll")]
+    static extern IntPtr GetWindowLongPtrW(IntPtr hWnd, int nIndex);
+
+    [DllImport("user32.dll")]
+    static extern IntPtr SetWindowLongPtrW(IntPtr hWnd, int nIndex, IntPtr dwNewLong);
+
+    // 64비트 전용 빌드라 GetWindowLongPtr 만 쓴다
+    public static long GetWindowLongPtr(IntPtr hWnd, int nIndex) => GetWindowLongPtrW(hWnd, nIndex).ToInt64();
+
+    public static void SetWindowLongPtr(IntPtr hWnd, int nIndex, long value) => SetWindowLongPtrW(hWnd, nIndex, new IntPtr(value));
 
     [DllImport("gdi32.dll")]
     [return: MarshalAs(UnmanagedType.Bool)]

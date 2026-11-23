@@ -1,0 +1,22 @@
+<Window x:Class="Citrus.Ui.BusyWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Citrus 작업 중"
+        SizeToContent="WidthAndHeight"
+        WindowStyle="None" AllowsTransparency="True" Background="Transparent"
+        ResizeMode="NoResize" Topmost="True" ShowInTaskbar="False" ShowActivated="False"
+        WindowStartupLocation="Manual" Focusable="False"
+        FontFamily="Segoe UI Variable Text, Segoe UI, Malgun Gothic"
+        TextOptions.TextFormattingMode="Display">
+    <!-- 변환하는 동안 화면 오른쪽 아래(작업 표시줄 위)에 뜨는 작은 알림. 마우스는 통과한다 -->
+    <Border Margin="8" Padding="14,10" CornerRadius="8" Background="#EE202020" BorderBrush="#40FFFFFF" BorderThickness="1" MinWidth="220">
+        <Border.Effect>
+            <DropShadowEffect BlurRadius="12" ShadowDepth="2" Opacity="0.35" />
+        </Border.Effect>
+        <StackPanel>
+            <TextBlock x:Name="Heading" Text="Citrus 작업 중" Foreground="#FFFFA94D" FontWeight="SemiBold" FontSize="13" />
+            <TextBlock x:Name="Detail" Foreground="White" FontSize="12" Margin="0,3,0,6" TextWrapping="Wrap" MaxWidth="340" />
+            <ProgressBar x:Name="Bar" Height="3" Minimum="0" Maximum="100" Foreground="#FFFFA94D" Background="#30FFFFFF" BorderThickness="0" />
+        </StackPanel>
+    </Border>
+</Window>
