@@ -50,5 +50,6 @@ foreach ($folder in [Environment]::GetFolderPath('Desktop'), [Environment]::GetF
     $link.Save()
 }
 
-Start-Process $exe
+# 탐색기를 통해 띄워 이 스크립트를 실행한 창·세션과 떼어 놓는다. 그냥 띄우면 그 창이 닫힐 때 시트러스도 같이 꺼진다.
+Start-Process explorer.exe "`"$exe`""
 Write-Host "설치 완료: $exe"
