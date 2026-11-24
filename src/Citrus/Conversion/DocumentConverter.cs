@@ -9,6 +9,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using ImageMagick;
 using Citrus.Core;
+using Citrus.Services;
 
 namespace Citrus.Conversion;
 
@@ -87,7 +88,28 @@ internal static class DocumentConverter
         }
     }
 
+    /// <summary>
+    /// 한글의 "PDF로 저장" 으로 만든다. 한글은 PDF 로 저장하다가 스스로 꺼지는 일이 잦은데(HNCE2PTP.dll),
+    /// 같은 파일도 다시 하면 되는 경우가 많아 꺼졌을 때는 새 한글로 한 번 더 한다.
+    /// </summary>
     static void Hancom(string source, string output)
+    {
+        try
+        {
+            HancomOnce(source, output);
+        }
+        catch (COMException ex) when (HancomCrashed(ex))
+        {
+            AppLog.Write($"한글이 변환 중 꺼져 한 번 더 합니다: {source} ({ex.Message})");
+            HancomOnce(source, output);
+        }
+    }
+
+    // RPC 서버를 사용할 수 없음 / 서버가 응답 없이 끊김: 한글 프로세스가 작업 도중 꺼졌다
+    static bool HancomCrashed(COMException ex) =>
+        ex.HResult is unchecked((int)0x800706BA) or unchecked((int)0x80010108) or unchecked((int)0x800706BE);
+
+    static void HancomOnce(string source, string output)
     {
         dynamic hwp = Create("HWPFrame.HwpObject", "한글");
         try
@@ -101,8 +123,15 @@ internal static class DocumentConverter
         }
         finally
         {
-            hwp.Clear(1); // 1 = 저장하지 않고 닫기
-            hwp.Quit();
+            try
+            {
+                hwp.Clear(1); // 1 = 저장하지 않고 닫기
+                hwp.Quit();
+            }
+            catch (COMException)
+            {
+                // 이미 꺼진 한글에는 닫으라고 할 수 없다. 원래 오류를 가리지 않도록 넘긴다
+            }
             Release(hwp);
         }
     }
