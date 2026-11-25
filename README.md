@@ -1,8 +1,8 @@
-# Citrus for Windows — 끌어서 바로 바꾸는 파일 변환기
+# Citrus — 끌어서 바로 바꾸는 파일 변환기
 
 탐색기에서 파일을 끌어오면서 `Shift` 를 누르면 원형 메뉴가 뜨고, 고른 형식으로 바로 바꿔 주는 Windows 용 개인 프로젝트입니다.
 
-> **English** — A drag-and-drop file converter for Windows. Start dragging files in File Explorer, press `Shift`,
+> **English** — A drag-and-drop file converter. Start dragging files in File Explorer, press `Shift`,
 > and a radial "citrus slice" menu appears under the cursor; drop on a slice and the converted file is saved
 > next to the original. It handles images, video and audio (FFmpeg), Hangul/Word/Excel/PowerPoint → PDF,
 > PDF merge, split and PDF → JPG/PNG, Excel ↔ CSV, subtitles (SRT ↔ VTT), ZIP and copying file paths.

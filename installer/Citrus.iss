@@ -11,11 +11,11 @@
 
 [Setup]
 AppId={{BB395B16-E28B-48BC-8C32-A8DDEE870CA5}
-AppName=Citrus for Windows
+AppName=Citrus
 AppVerName=시트러스 {#AppVersion}
 AppVersion={#AppVersion}
 AppPublisher=dlaclan
-AppPublisherURL=https://github.com/dlaclan94-ux/citrus-for-windows
+AppPublisherURL=https://github.com/dlaclan94-ux/citrus
 AppComments=끌어서 바로 바꾸는 파일 변환기. 개인 프로젝트.
 DefaultDirName={localappdata}\Programs\Citrus
 DisableDirPage=yes
@@ -28,7 +28,7 @@ OutputDir=..\out
 OutputBaseFilename=Citrus-Setup-v{#AppVersion}
 SetupIconFile=..\src\Citrus\Citrus.ico
 UninstallDisplayIcon={app}\Citrus.exe
-UninstallDisplayName=Citrus for Windows (시트러스)
+UninstallDisplayName=Citrus (시트러스)
 WizardStyle=modern
 Compression=lzma2/max
 SolidCompression=yes

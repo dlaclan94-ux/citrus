@@ -17,7 +17,7 @@
     <NoWarn>$(NoWarn);WFO0003</NoWarn>
     <AssemblyName>Citrus</AssemblyName>
     <RootNamespace>Citrus</RootNamespace>
-    <Product>Citrus for Windows</Product>
+    <Product>Citrus</Product>
     <Version>1.1.0</Version>
     <Company>dlaclan</Company>
     <Authors>dlaclan</Authors>
